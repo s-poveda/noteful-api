@@ -1,0 +1,36 @@
+{
+  "name": "noteful-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "presetup": "[ -f \"./example.env\" ]  && (mv example.env .env && echo created '.env' file successfully) || echo \"no 'example.env.' Skipping...\"",
+    "setup": "node setup.js && git init && npm i",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "mocha --require test/setup.js",
+    "tw": "mocha -- --watch --require test/setup.js",
+    "predeploy": "npm audit",
+    "deploy": "git push heroku master"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^4.1.1",
+    "knex": "^0.21.12",
+    "morgan": "^1.10.0",
+    "pg": "^8.4.2",
+    "postgrator": "^4.1.1",
+    "xss": "^1.0.8"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.0",
+    "nodemon": "^2.0.6",
+    "supertest": "^5.0.0"
+  }
+}
