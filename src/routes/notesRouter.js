@@ -11,7 +11,8 @@ notesRouter.use(['/','/:noteId'], (req, res, next) => {
 
 notesRouter.route('/')
 	.get( async (req, res, next) => {
-		const allNotes = await notesService.getAllNotes( req.get('db'))
+		let allNotes = await notesService.getAllNotes( req.app.get('db'));
+		allNotes = allNotes.length ? allNotes : ['nothing found'];
 		res.json(allNotes);
 	})
 	.post( (req, res,next) => {
