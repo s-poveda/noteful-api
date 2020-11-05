@@ -10,6 +10,8 @@
     "dev": "nodemon src/server.js",
     "test": "mocha --require test/setup.js",
     "tw": "mocha -- --watch --require test/setup.js",
+		"migrate": "postgrator --config postgrator-config.js",
+		"migrate:test": "env NODE_ENV=test npm run migrate",
     "predeploy": "npm audit",
     "deploy": "git push heroku master"
   },
