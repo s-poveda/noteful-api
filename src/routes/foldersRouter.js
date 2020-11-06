@@ -36,6 +36,7 @@ foldersRouter.route('/')
 			);
 			res.status(201).send(folder[0]);
 		} catch (e) {
+			console.log(e);
 			next();
 		}
 	});

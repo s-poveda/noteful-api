@@ -19,7 +19,7 @@ module.exports = {
 		return db('folders')
 		.update(newInfo)
 		.where({ id: folderId })
-		.returning('title')
+		.returning('name')
 	},
 	deleteFolder(db, id) {
 		return db('folders')

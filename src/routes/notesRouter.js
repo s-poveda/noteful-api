@@ -35,7 +35,6 @@ notesRouter.route('/')
 				req.app.get('db'),
 				serializeNote(req.body)
 			);
-			console.log(addedNote[0]);
 			res.status(201).json(addedNote[0]);
 		} catch(e) {
 			console.log(e);
@@ -68,7 +67,7 @@ notesRouter.route('/:noteId')
 				req.app.get('db'),
 				noteId
 			);
-			res.sendStatus(204);
+			res.status(204).json({});
 		} catch (e) {
 			next();
 		}

@@ -22,7 +22,7 @@ const notesService = {
 		return db('notes')
 		.update(toBeAdded)
 		.where({ id: noteId })
-		.returning('*')
+		.returning('name')
 		.first();
 	},
 	deleteNote(db, id) {
