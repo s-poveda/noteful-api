@@ -15,7 +15,7 @@ const serializeNote = note => {
 	return {
 		id: note.id,
 		folder_id: note.folder_id,
-		title: xss(note.title),
+		name: xss(note.name),
 		content: note.content === null ? null : xss(note.content)
 	}
 }
@@ -24,10 +24,9 @@ notesRouter.route('/')
 	.get( async (req, res, next) => {
 		try {
 			let allNotes = await notesService.getAllNotes( req.app.get('db'));
-			allNotes = allNotes.length ? allNotes : ['nothing found'];
 			res.json(allNotes);
 		} catch(e) {
-			next(e);
+			next();
 		}
 	})
 	.post(jsonBodyParser, async (req, res,next) => {
@@ -36,9 +35,11 @@ notesRouter.route('/')
 				req.app.get('db'),
 				serializeNote(req.body)
 			);
-			res.status(201).send(addedNote[0]);
+			console.log(addedNote[0]);
+			res.status(201).json(addedNote[0]);
 		} catch(e) {
-			next(e);
+			console.log(e);
+			next();
 		}
 	});
 
@@ -55,7 +56,7 @@ notesRouter.route('/:noteId')
 			);
 			res.json(noteRes);
 		} catch (e) {
-			next(e);
+			next();
 		}
 	})
 	.delete( async (req, res, next) => {
@@ -69,7 +70,7 @@ notesRouter.route('/:noteId')
 			);
 			res.sendStatus(204);
 		} catch (e) {
-			next(e);
+			next();
 		}
 	})
 module.exports = notesRouter;

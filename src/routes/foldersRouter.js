@@ -14,7 +14,7 @@ foldersRouter.use(['/','/:folderId'], (req, res, next) => {
 const serializeFolder = folder => {
 	return {
 		id: folder.id,
-		title: xss(folder.title)
+		name: xss(folder.name)
 	}
 }
 
