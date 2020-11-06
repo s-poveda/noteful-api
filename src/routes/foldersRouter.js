@@ -67,7 +67,6 @@ foldersRouter.route('/:folderId')
 				.status(206)
 				.json(newFolderTitle[0]);
 		} catch (e) {
-			console.log(e);
 			next();
 		}
 	});
