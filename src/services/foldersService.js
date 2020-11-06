@@ -14,12 +14,12 @@ module.exports = {
 		.insert(folder)
 		.returning('*');
 	},
-	updateFolder(db, id, newInfo) {
+	updateFolder(db, folderId, info) {
+		const { id, ...newInfo } = info;
 		return db('folders')
 		.update(newInfo)
-		.where({ id })
-		.returning('*')
-		.first();
+		.where({ id: folderId })
+		.returning('title')
 	},
 	deleteFolder(db, id) {
 		return db('folders')

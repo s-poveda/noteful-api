@@ -113,6 +113,39 @@ describe('App', function(){
 					expect(res.body).to.be.an('object');
 					expect(res.body).to.eql(makeNewFolder());
 				});
+
+				context('with extra folders added', () => {
+					beforeEach('inserting one test folder', ()=> db('folders').insert(makeNewFolder()))
+
+					it('DELETE "/:folderId" should return 401 with no auth', async () => {
+						await supertest(app)
+							.delete('/folders/25')
+							.expect(401);
+					});
+
+					it('DELETE "/:folderId" should return 204', async () => {
+						await supertest(app)
+							.delete('/folders/25')
+							.set('Content-Type', 'application/json')
+							.set('Authorization', `Bearer ${API_TOKEN}`)
+							.expect(204);
+					});
+
+					it('PATCH "/:folderId" should return 401 with no auth', async () => {
+						await supertest(app).patch('/folders/25').expect(401);
+					});
+
+					it('PATCH "/:folderId" should return 206 and the updated title', async () => {
+						const changedFolder = { id: 25, title: 'some random title'};
+						const res = await supertest(app)
+							.patch('/folders/25')
+							.set('Content-Type', 'application/json')
+							.set('Authorization', `Bearer ${API_TOKEN}`)
+							.send(changedFolder)
+							.expect(206);
+						expect(res.body).to.eql(changedFolder.title);
+					});
+				});
 			});
 		});
 });
