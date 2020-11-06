@@ -1,5 +1,0 @@
-ALTER TABLE notes
-DROP COLUMN folder_id;
-
-ALTER TABLE notes
-ADD COLUMN folder_id INTEGER REFERENCES folders(id) NOT NULL;

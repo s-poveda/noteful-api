@@ -1,5 +1,5 @@
 TRUNCATE TABLE folders RESTART IDENTITY CASCADE;
-INSERT INTO folders (id, title)
+INSERT INTO folders (id, name)
 VALUES
 (1, 'folder 1'),
 (4, 'folder 4'),
