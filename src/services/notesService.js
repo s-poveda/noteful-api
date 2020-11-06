@@ -16,10 +16,12 @@ const notesService = {
 		.insert(note)
 		.returning('*');
 	},
-	updateNote(db, id, newInfo) {
+	updateNote(db, NoteId, newInfo) {
+		const {id, ...toBeAdded} = newInfo;
+
 		return db('notes')
-		.update(newInfo)
-		.where({ id })
+		.update(toBeAdded)
+		.where({ id: noteId })
 		.returning('*')
 		.first();
 	},

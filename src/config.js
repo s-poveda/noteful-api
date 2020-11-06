@@ -1,4 +1,6 @@
-const PORT = process.env.PORT || 8000;
-const NODE_ENV = process.env.NODE_ENV || production;
-
-module.exports = { PORT, NODE_ENV }
+module.exports = {
+	PORT :  process.env.PORT || 8000,
+	NODE_ENV : process.env.NODE_ENV || production,
+	DATABASE_URL : process.env.DATABASE_URL || '',
+	API_TOKEN : process.env.API_TOKEN
+ }
