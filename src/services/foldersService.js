@@ -9,7 +9,7 @@ module.exports = {
 		.where({ id })
 		.first();
 	},
-	insertFolder(db, note) {
+	insertFolder(db, folder) {
 		return db('folders')
 		.insert(note)
 		.returning('*');

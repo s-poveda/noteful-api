@@ -1,6 +1,7 @@
 const knex = require('knex');
 const notesService = require('../src/services/notesService');
-const { makeNewNote, makeTestNotes } = require('./notes.fixture')
+const { makeNewNote, makeTestNotes } = require('./notes.fixture');
+const { makeTestFolders, makeNewFolder } = require('./folders.fixture');
 const app = require('../src/app');
 
 const { TEST_DB_URL, API_TOKEN } = process.env;
@@ -24,20 +25,22 @@ describe('App', function(){
 
 		describe('/notes route', function(){
 			context('with notes inserted', () => {
-
 				beforeEach('insert test notes', ()=> db('notes').insert(makeTestNotes()));
+
 				afterEach('remove test notes', ()=> db('notes').truncate());
 
 				it('GET "/" should return all notes', async () =>{
 					const res = await supertest(app).get('/notes').expect(200);
 					expect(res.body).to.be.an('array');
 					expect(res.body[0]).to.eql(makeTestNotes()[0]);
+					// TODO: check db for persistance
 				});
 
 				it('POST "/" with no auth returns 401', async () => {
 					const res = await supertest(app).post('/notes').expect(401);
 					expect(res.body).to.be.an('object');
 					expect(res.body.error).to.be.a('string');
+					// TODO: check db for persistance
 				});
 
 				it('POST "/" should return 201 and the added object', async () => {
@@ -49,6 +52,33 @@ describe('App', function(){
 						.expect(201);
 					expect(res.body).to.be.an('object');
 					expect(res.body).to.eql(makeNewNote());
+					// TODO: check db for persistance
+				});
+
+				it('GET "/:noteId" should return the correct note', async () =>{
+					const noteId = 2;
+					const res = await supertest(app)
+						.get(`/notes/${noteId}`)
+						.expect(200);
+					expect(res.body).to.be.an('object');
+					expect(res.body).to.eql(makeTestNotes()[noteId - 1]);
+					// TODO: check db for persistance
+				});
+
+				it('DELETE "/:noteId" with no auth should return 401', async () => {
+					await supertest(app)
+						.delete('/notes/1')
+						.expect(401);
+						// TODO: check db for persistance
+				});
+
+				it('DELETE "/:noteId" returns 204 and no content', async () => {
+					const res = await supertest(app)
+						.delete('/notes/1')
+						.set('Authorization', `Bearer ${API_TOKEN}`)
+						.expect(204);
+					expect(res.body).to.be.empty;
+					// TODO: check db for persistance
 				});
 			});
 
@@ -56,6 +86,33 @@ describe('App', function(){
 		});
 
 		describe('/folders route', function() {
+			context('with populated folders', () => {
 
+				//due to FK constraint on notes, it is not possible to truncate
+				//test folders without compromising test data integrity.
+				//ALL OF THESE TEST REQUIRE SEEDING DB BEFORE RUNNIG THEM
+				//there has to be a better way of going about this....
+				it('GET "/" should return array of all folders', async () => {
+					const res = await supertest(app)
+						.get('/folders')
+						.expect(200);
+					expect(res.body).to.be.eql(makeTestFolders(db));
+				});
+
+				it('POST "/" should return 401 with no auth', async () => {
+					await supertest(app).post('/folders').expect(401);
+				});
+
+				it('POST "/" should return the added folder object', async () => {
+					const res = await supertest(app)
+						.post('/folders')
+						.set('Authorization', `Bearer ${API_TOKEN}`)
+						.set('Content-Type', 'application/json')
+						.send(makeNewFolder(db))
+						.expect(201);
+					expect(res.body).to.be.an('object');
+					expect(res.body).to.eql(makeNewFolder());
+				});
+			});
 		});
 });

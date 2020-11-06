@@ -41,4 +41,35 @@ notesRouter.route('/')
 			next(e);
 		}
 	});
+
+notesRouter.route('/:noteId')
+	.get( async (req, res, next) => {
+		try {
+			const noteId = Number(req.params.noteId);
+			// NaN is falsy
+			if (!noteId) throw 'invalid noteId';
+
+			const noteRes = await notesService.getNoteById(
+				req.app.get('db'),
+				noteId
+			);
+			res.json(noteRes);
+		} catch (e) {
+			next(e);
+		}
+	})
+	.delete( async (req, res, next) => {
+		try {
+			const noteId = Number(req.params.noteId);
+			if (!noteId) throw 'invalid note id';
+
+			await notesService.deleteNote(
+				req.app.get('db'),
+				noteId
+			);
+			res.sendStatus(204);
+		} catch (e) {
+			next(e);
+		}
+	})
 module.exports = notesRouter;
