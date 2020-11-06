@@ -14,7 +14,7 @@ foldersRouter.use(['/','/:folderId'], (req, res, next) => {
 const serializeFolder = folder => {
 	return {
 		id: folder.id,
-		title: xss(note.title),
+		title: xss(folder.title)
 	}
 }
 
@@ -23,14 +23,13 @@ foldersRouter.route('/')
 		const folders = await foldersService.getAllFolders(req.app.get('db'));
 		res.json(folders);
 	})
-	.post( async (req, res, next) => {
-		console.log(req.body);
+	.post(jsonBodyParser, async (req, res, next) => {
 		let folder = serializeFolder(req.body);
-		folder = foldersService.insertFolder(
+		folder =  await foldersService.insertFolder(
 			req.app.get('db'),
 			folder
 		);
-		res.status(201).send(folder);
+		res.status(201).send(folder[0]);
 	});
 
 module.exports = foldersRouter;

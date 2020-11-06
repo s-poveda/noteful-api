@@ -11,7 +11,7 @@ module.exports = {
 	},
 	insertFolder(db, folder) {
 		return db('folders')
-		.insert(note)
+		.insert(folder)
 		.returning('*');
 	},
 	updateFolder(db, id, newInfo) {

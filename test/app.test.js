@@ -86,8 +86,8 @@ describe('App', function(){
 		});
 
 		describe('/folders route', function() {
-			context('with populated folders', () => {
-
+			context('with default populated folders', () => {
+				beforeEach(()=> db('folders').where({id: 25}).del());
 				//due to FK constraint on notes, it is not possible to truncate
 				//test folders without compromising test data integrity.
 				//ALL OF THESE TEST REQUIRE SEEDING DB BEFORE RUNNIG THEM
@@ -106,9 +106,9 @@ describe('App', function(){
 				it('POST "/" should return the added folder object', async () => {
 					const res = await supertest(app)
 						.post('/folders')
+						.send(makeNewFolder(db))
 						.set('Authorization', `Bearer ${API_TOKEN}`)
 						.set('Content-Type', 'application/json')
-						.send(makeNewFolder(db))
 						.expect(201);
 					expect(res.body).to.be.an('object');
 					expect(res.body).to.eql(makeNewFolder());
