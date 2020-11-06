@@ -136,14 +136,14 @@ describe('App', function(){
 					});
 
 					it('PATCH "/:folderId" should return 206 and the updated title', async () => {
-						const changedFolder = { id: 25, title: 'some random title'};
+						const changedFolder = { id: 25, name: 'some random title'};
 						const res = await supertest(app)
 							.patch('/folders/25')
 							.set('Content-Type', 'application/json')
 							.set('Authorization', `Bearer ${API_TOKEN}`)
 							.send(changedFolder)
 							.expect(206);
-						expect(res.body).to.eql(changedFolder.title);
+						expect(res.body).to.eql(changedFolder.name);
 					});
 				});
 			});
