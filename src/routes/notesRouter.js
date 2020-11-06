@@ -12,7 +12,6 @@ notesRouter.use(['/','/:noteId'], (req, res, next) => {
 });
 
 const serializeNote = note => {
-	console.log( JSON.stringify(note.content));
 	return {
 		id: note.id,
 		folder_id: note.folder_id,
