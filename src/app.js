@@ -18,9 +18,6 @@ app.use(cors());
 // routes ::::::::
 app.use('/notes', notesRouter);
 app.use('/folders', foldersRouter);
-app.get('/', (req, res)=>{
-	res.status(200).end();
-});
 
 //generic error handler
 app.use( (error, req, res, next) =>{
