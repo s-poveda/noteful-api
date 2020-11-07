@@ -34,13 +34,14 @@ describe('App', function(){
 					expect(res.body).to.be.an('array');
 					expect(res.body[0]).to.eql(makeTestNotes()[0]);
 					// TODO: check db for persistance
+					const dbData = await db('notes').select();
+					expect(res.body).to.eql(dbData);
 				});
 
 				it('POST "/" with no auth returns 401', async () => {
 					const res = await supertest(app).post('/notes').expect(401);
 					expect(res.body).to.be.an('object');
 					expect(res.body.error).to.be.a('string');
-					// TODO: check db for persistance
 				});
 
 				it('POST "/" should return 201 and the added object', async () => {
@@ -53,6 +54,8 @@ describe('App', function(){
 					expect(res.body).to.be.an('object');
 					expect(res.body).to.eql(makeNewNote());
 					// TODO: check db for persistance
+					const dbData = await db('notes').select().where({id : res.body.id}).first();
+					expect(res.body).to.eql(dbData);
 				});
 
 				it('GET "/:noteId" should return the correct note', async () =>{
@@ -63,22 +66,28 @@ describe('App', function(){
 					expect(res.body).to.be.an('object');
 					expect(res.body).to.eql(makeTestNotes()[noteId - 1]);
 					// TODO: check db for persistance
+					const dbData = await db('notes').select().where({id : noteId}).first();
+					expect(res.body).to.eql(dbData);
 				});
 
 				it('DELETE "/:noteId" with no auth should return 401', async () => {
 					await supertest(app)
 						.delete('/notes/1')
 						.expect(401);
-						// TODO: check db for persistance
 				});
 
 				it('DELETE "/:noteId" returns 204 and no content', async () => {
+					const noteId = 1;
+					const dbDataBefore = await db('notes').where({id : noteId}).del().returning('*');
 					const res = await supertest(app)
-						.delete('/notes/1')
+						.delete(`/notes/${noteId}`)
 						.set('Authorization', `Bearer ${API_TOKEN}`)
 						.expect(204);
 					expect(res.body).to.be.empty;
 					// TODO: check db for persistance
+					const dbData = await db('notes').where({id : noteId}).del().returning('*');
+					expect(dbDataBefore[0]).to.have.all.keys(['id', 'name', 'content', 'folder_id'])
+					expect(dbData).to.be.empty;
 				});
 			});
 
@@ -97,6 +106,8 @@ describe('App', function(){
 						.get('/folders')
 						.expect(200);
 					expect(res.body).to.be.eql(makeTestFolders(db));
+					const dbData = await db('folders').select();
+					expect(res.body).to.eql(dbData);
 				});
 
 				it('POST "/" should return 401 with no auth', async () => {
@@ -104,14 +115,19 @@ describe('App', function(){
 				});
 
 				it('POST "/" should return the added folder object', async () => {
+					const newFolder = makeNewFolder(db);
+					const dbDataBefore = await db('folders').select().where({id : newFolder.id});
 					const res = await supertest(app)
 						.post('/folders')
-						.send(makeNewFolder(db))
+						.send(newFolder)
 						.set('Authorization', `Bearer ${API_TOKEN}`)
 						.set('Content-Type', 'application/json')
 						.expect(201);
 					expect(res.body).to.be.an('object');
-					expect(res.body).to.eql(makeNewFolder());
+					expect(res.body).to.eql(newFolder);
+					const dbData = await db('folders').select().where({id : newFolder.id}).first();
+					expect(dbDataBefore).to.be.empty;
+					expect(res.body).to.eql(dbData);
 				});
 
 				context('with extra folders added', () => {
@@ -124,11 +140,16 @@ describe('App', function(){
 					});
 
 					it('DELETE "/:folderId" should return 204', async () => {
+						const folderId = 25;
+						const dbDataBefore = await db('folders').select().where({id : folderId}).first();
 						await supertest(app)
-							.delete('/folders/25')
+							.delete(`/folders/${folderId}`)
 							.set('Content-Type', 'application/json')
 							.set('Authorization', `Bearer ${API_TOKEN}`)
 							.expect(204);
+						const dbData = await db('folders').select().where({id : folderId}).first();
+						expect(dbDataBefore).to.have.all.keys(['name', 'id']);
+						expect(dbData).not.to.exist;
 					});
 
 					it('PATCH "/:folderId" should return 401 with no auth', async () => {
