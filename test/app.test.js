@@ -158,13 +158,17 @@ describe('App', function(){
 
 					it('PATCH "/:folderId" should return 206 and the updated title', async () => {
 						const changedFolder = { id: 25, name: 'some random title'};
+						const dbDataBefore = await db('folders').select().where({ id : changedFolder.id }).first();
 						const res = await supertest(app)
-							.patch('/folders/25')
+							.patch(`/folders/${changedFolder.id}`)
 							.set('Content-Type', 'application/json')
 							.set('Authorization', `Bearer ${API_TOKEN}`)
 							.send(changedFolder)
 							.expect(206);
+						const dbData = await db('folders').select('name').where({ id : changedFolder.id }).first();
 						expect(res.body).to.eql(changedFolder.name);
+						expect(dbDataBefore).to.have.all.keys(['name', 'id']);
+						expect(dbData).to.have.all.keys(['name']);
 					});
 				});
 			});
