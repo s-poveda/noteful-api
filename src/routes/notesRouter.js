@@ -16,7 +16,8 @@ const serializeNote = note => {
 		id: note.id,
 		folder_id: note.folder_id,
 		name: xss(note.name),
-		content: note.content === null ? null : xss(note.content)
+		content: note.content === null ? null : xss(note.content),
+		modified: note.modified
 	}
 }
 

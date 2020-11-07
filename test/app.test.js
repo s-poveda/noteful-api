@@ -32,10 +32,10 @@ describe('App', function(){
 				it('GET "/" should return all notes', async () =>{
 					const res = await supertest(app).get('/notes').expect(200);
 					expect(res.body).to.be.an('array');
-					expect(res.body[0]).to.eql(makeTestNotes()[0]);
+					expect({...res.body[0], modified: new Date(res.body[0].modified)}).to.eql(makeTestNotes()[0]);
 					// TODO: check db for persistance
 					const dbData = await db('notes').select();
-					expect(res.body).to.eql(dbData);
+					expect(res.body.map( e=>{ return {...e, modified: new Date(e.modified) }})).to.eql(dbData);
 				});
 
 				it('POST "/" with no auth returns 401', async () => {
@@ -52,10 +52,10 @@ describe('App', function(){
 						.send(makeNewNote())
 						.expect(201);
 					expect(res.body).to.be.an('object');
-					expect(res.body).to.eql(makeNewNote());
+					expect({...res.body, modified: new Date(res.body.modified)}).to.eql(makeNewNote());
 					// TODO: check db for persistance
 					const dbData = await db('notes').select().where({id : res.body.id}).first();
-					expect(res.body).to.eql(dbData);
+					expect({...res.body, modified: new Date(res.body.modified)}).to.eql(dbData);
 				});
 
 				it('GET "/:noteId" should return the correct note', async () =>{
@@ -64,10 +64,10 @@ describe('App', function(){
 						.get(`/notes/${noteId}`)
 						.expect(200);
 					expect(res.body).to.be.an('object');
-					expect(res.body).to.eql(makeTestNotes()[noteId - 1]);
+					expect({...res.body, modified: new Date(res.body.modified)}).to.eql(makeTestNotes()[noteId - 1]);
 					// TODO: check db for persistance
 					const dbData = await db('notes').select().where({id : noteId}).first();
-					expect(res.body).to.eql(dbData);
+					expect({...res.body, modified: new Date(res.body.modified)}).to.eql(dbData);
 				});
 
 				it('DELETE "/:noteId" with no auth should return 401', async () => {
@@ -86,7 +86,7 @@ describe('App', function(){
 					expect(res.body).to.be.empty;
 					// TODO: check db for persistance
 					const dbData = await db('notes').where({id : noteId}).del().returning('*');
-					expect(dbDataBefore[0]).to.have.all.keys(['id', 'name', 'content', 'folder_id'])
+					expect(dbDataBefore[0]).to.have.all.keys(['id', 'name', 'content', 'folder_id', 'modified'])
 					expect(dbData).to.be.empty;
 				});
 			});
